@@ -14,6 +14,7 @@ import CreateTouristAttractionForm from "./components/admin/CreateTouristAttract
 import TouristAttractionsView from "./components/common/TouristAttractionsView";
 import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import Wishlist from "./components/pages/Wishlist";
+import Contact from "./components/admin/Contact";
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
@@ -92,6 +93,17 @@ function App() {
           component={CreateTouristAttractionForm}
           element={<CreateTouristAttractionForm></CreateTouristAttractionForm>}
         />
+        </Route>
+        <Route
+          exact
+          path="/"
+          element={<ProtectedRoute roleRequired="ROLE_CLIENT" />}
+        >
+          <Route
+            path="/contact"
+            component={Contact}
+            element={<Contact/>}
+          />
         </Route>
       </Routes>
     </>
