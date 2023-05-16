@@ -3,25 +3,37 @@ import axios from "axios";
 import styled from "styled-components";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import EuroIcon from '@mui/icons-material/Euro';
-import DiscountIcon from '@mui/icons-material/Discount';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+import EuroIcon from "@mui/icons-material/Euro";
+import DiscountIcon from "@mui/icons-material/Discount";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EditIcon from "@mui/icons-material/Edit";
+import SearchIcon from "@mui/icons-material/Search";
+
 import { Button } from "./Button";
-import {MDBBtn} from "mdb-react-ui-kit";
+import { MDBBtn } from "mdb-react-ui-kit";
 import {
   deleteAttraction,
+  filterAttractions,
   getArttractions,
 } from "../../services/AttractionsService";
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
-import Modal from 'react-bootstrap/Modal';
+import Modal from "react-bootstrap/Modal";
 import UpdateAttractionDetailsForm from "../admin/UpdateAttractionDetailsForm";
 import { addAttractionToWishlist } from "../../services/WishlistService";
+import {
+  FormControl,
+  RadioGroup,
+  FormLabel,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
+import { TextSearchDto } from "../../services/dto/TextSearchDto";
 
 const AboutSection = styled.section`
   width: 100%;
   height: 100%;
+  padding: 4rem 0rem;
   background: #d2cbc1;
 `;
 
@@ -163,12 +175,31 @@ const TouristAttractionsView = () => {
   const [attractions, setAttractions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [attractionToEdit, setAttractionToEdit] = useState();
+  const [searchInput, setSearchInput] = useState("");
+  const [filterValue, setFilterValue] = useState("name");
+
+  const handleFilterChange = (event) => {
+    setFilterValue(event.target.value);
+  };
+
+  const applyFilter = () => {
+    const textSearchDto = new TextSearchDto(filterValue, searchInput);
+    console.log("TextSearchDto", textSearchDto)
+    filterAttractions(textSearchDto)
+    .then((response) => {
+        const attractions = response.data;
+        setAttractions(attractions);
+        console.log("filtered: ", attractions);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
   const handleCloseModal = () => setShowModal(false);
 
   const handleShowModal = (attraction) => {
     setAttractionToEdit(attraction);
-    console.log(attraction)
-
     setShowModal(true);
   };
 
@@ -212,7 +243,7 @@ const TouristAttractionsView = () => {
 
   const addToFavorites = (attractionId) => {
     addAttractionToWishlist(user.id, attractionId)
-    .then((response) => {
+      .then((response) => {
         console.log(response);
         if (response.status === 200) {
           Swal.fire(
@@ -229,7 +260,11 @@ const TouristAttractionsView = () => {
           window.location = `/attractions`;
         });
       });
-  }
+  };
+
+  const handleChange = (event) => {
+    setSearchInput(event.target.value);
+  };
 
   return (
     <AboutSection>
@@ -255,12 +290,52 @@ const TouristAttractionsView = () => {
               style={{ display: "flex", flexDirection: "row" }}
             >
               <div class="search" style={{ marginRight: "1000px" }}>
-                <input
-                  class="form-control"
-                  type="text"
-                  placeholder="Search Keywords"
-                />
+                <div style={{ display: "flex", flexDirection: "row" }}>
+                  <input
+                    style={{ marginBottom: "10px" }}
+                    class="form-control"
+                    type="text"
+                    placeholder="Search keywords"
+                    onChange={handleChange}
+                  />
+                  <Button style={{minWidth: "10px", height:"35px", borderRadius:"5px"}} onClick={applyFilter}>
+                    <SearchIcon />
+                  </Button>
+                </div>
+                <FormControl>
+                  <FormLabel id="demo-radio-buttons-group-label">
+                    Filter by:{" "}
+                  </FormLabel>
+                  <RadioGroup
+                    value={filterValue}
+                    name="radio-buttons-group"
+                    row
+                    onChange={handleFilterChange}
+                  >
+                    <FormControlLabel
+                      value="name"
+                      control={<Radio />}
+                      label="Name"
+                    />
+                    <FormControlLabel
+                      value="location"
+                      control={<Radio />}
+                      label="Location"
+                    />
+                    <FormControlLabel
+                      value="textDescription"
+                      control={<Radio />}
+                      label="Description"
+                    />
+                    <FormControlLabel
+                      value="visitingDate"
+                      control={<Radio />}
+                      label="Visiting date"
+                    />
+                  </RadioGroup>
+                </FormControl>
               </div>
+
               {user && user.userRole === "ROLE_ADMIN" && (
                 <Button to="/admin/attractions-management/add">
                   New attraction
@@ -289,16 +364,16 @@ const TouristAttractionsView = () => {
                         </AttractionListTitle>
                         <AttractionListOption>
                           <ul class="list-unstyled">
-                          <li>
-                              <LocationOnIcon  sx={{ fontSize: 15 }} />
+                            <li>
+                              <LocationOnIcon sx={{ fontSize: 15 }} />
                               {attraction.location}
                             </li>
                             <li>
-                              <EuroIcon sx={{ fontSize: 15 }}/>
+                              <EuroIcon sx={{ fontSize: 15 }} />
                               {attraction.entryPrice}
                             </li>
                             <li>
-                              <DiscountIcon sx={{ fontSize: 15 }}/>
+                              <DiscountIcon sx={{ fontSize: 15 }} />
                               {attraction.discount}
                             </li>
                           </ul>
@@ -306,12 +381,16 @@ const TouristAttractionsView = () => {
                       </div>
                       <AttractionListFavouriteTime>
                         {!user || user.userRole === "ROLE_CLIENT" ? (
-                          <AttractionListFavourite onClick={() => addToFavorites(attraction.id)}>
+                          <AttractionListFavourite
+                            onClick={() => addToFavorites(attraction.id)}
+                          >
                             <FavoriteIcon />
                           </AttractionListFavourite>
                         ) : (
                           <>
-                            <EditButtonContainer onClick={() => handleShowModal(attraction)}>
+                            <EditButtonContainer
+                              onClick={() => handleShowModal(attraction)}
+                            >
                               <EditIcon />
                             </EditButtonContainer>{" "}
                             <AttractionListFavourite

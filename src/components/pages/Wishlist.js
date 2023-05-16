@@ -23,6 +23,7 @@ import {
 const AboutSection = styled.section`
   width: 100%;
   height: 100%;
+  padding: 4rem 0rem;
   background: #d2cbc1;
 `;
 
