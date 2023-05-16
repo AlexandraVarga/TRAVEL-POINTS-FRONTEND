@@ -7,4 +7,5 @@ export const MenuData = [
     user === null && {title : 'Register', link : '/register'}, 
     user != null && user.role === "ROLE_CLIENT" && {title : 'About', link: '/about'},
     user != null && user.userRole === "ROLE_CLIENT" && {title : "Wishlist", link : '/wishlist'},
+    user != null && user.userRole === "ROLE_CLIENT" && {title : "Contact", link : '/contact'},
 ]
