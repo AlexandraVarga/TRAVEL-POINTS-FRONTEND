@@ -189,13 +189,7 @@ const Wishlist = () => {
               class="widget border-0"
               style={{ display: "flex", flexDirection: "row" }}
             >
-              <div class="search" style={{ marginRight: "1000px" }}>
-                <input
-                  class="form-control"
-                  type="text"
-                  placeholder="Search Keywords"
-                />
-              </div>
+              
             </div>
           </div>
         </SearchContainer>

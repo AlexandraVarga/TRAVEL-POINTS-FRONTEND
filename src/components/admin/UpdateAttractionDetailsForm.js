@@ -59,6 +59,22 @@ export default function UpdateAttractionDetailsForm(props) {
   const handleUpdate = (data) => {
 
   const attractionDto = new TouristAttractionDto(formValue);
+  
+  // if(attractionDto.discount !== attractionToEdit.discount) {
+  //   getUsersWithAttractionInWishlist(attractionDto.id)
+  //   .then((response) => {
+  //     console.log(response);
+  //     if (response.status === 200) {
+       
+      
+  //     }
+  //   })
+  //   .catch((err) => {
+  //     Swal.fire("Error", err.response, "error").then(function () {
+  //       window.location = `/attractions`;
+  //     });
+  //   });
+  // }
 
    updateAttraction(attractionDto, attractionDto.id)
       .then((response) => {

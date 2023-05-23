@@ -29,6 +29,7 @@ import {
   Radio,
 } from "@mui/material";
 import { TextSearchDto } from "../../services/dto/TextSearchDto";
+import TouristAttractionDetails from "../pages/TouristAttractionDetails";
 
 const AboutSection = styled.section`
   width: 100%;
@@ -83,9 +84,11 @@ const AttractionListImage = styled.img`
   -o-object-fit: cover;
   object-fit: cover;
 `;
+
 const AttractionListTitle = styled.div`
   margin-bottom: 5px;
 `;
+
 const AttractionListDetails = styled.div`
   display: -webkit-box;
   display: -ms-flexbox;
@@ -174,9 +177,11 @@ let user = JSON.parse(localStorage.getItem("userData"));
 const TouristAttractionsView = () => {
   const [attractions, setAttractions] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [attractionToEdit, setAttractionToEdit] = useState();
   const [searchInput, setSearchInput] = useState("");
   const [filterValue, setFilterValue] = useState("name");
+  const [selectedAttraction, setSelectedAttraction] = useState(null);
 
   const handleFilterChange = (event) => {
     setFilterValue(event.target.value);
@@ -197,10 +202,16 @@ const TouristAttractionsView = () => {
   }
 
   const handleCloseModal = () => setShowModal(false);
+  const handleCloseDetailsModal = () => setShowDetailsModal(false);
 
   const handleShowModal = (attraction) => {
     setAttractionToEdit(attraction);
     setShowModal(true);
+  };
+
+  const handleShowDetailsModal = (attraction) => {
+    setSelectedAttraction(attraction);
+    setShowDetailsModal(true);
   };
 
   const retrieveTouristAttractions = () => {
@@ -282,6 +293,16 @@ const TouristAttractionsView = () => {
         </Modal.Footer>
       </Modal>
 
+      <Modal show={showDetailsModal} onHide={handleCloseDetailsModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Tourist attraction's details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <TouristAttractionDetails attraction={selectedAttraction} />
+        </Modal.Body>
+ 
+      </Modal>
+
       <Container>
         <SearchContainer>
           <div class="sidebar">
@@ -289,7 +310,7 @@ const TouristAttractionsView = () => {
               class="widget border-0"
               style={{ display: "flex", flexDirection: "row" }}
             >
-              <div class="search" style={{ marginRight: "1000px" }}>
+              <div class="search">
                 <div style={{ display: "flex", flexDirection: "row" }}>
                   <input
                     style={{ marginBottom: "10px" }}
@@ -298,9 +319,14 @@ const TouristAttractionsView = () => {
                     placeholder="Search keywords"
                     onChange={handleChange}
                   />
-                  <Button style={{minWidth: "10px", height:"35px", borderRadius:"5px"}} onClick={applyFilter}>
+                  <Button style={{minWidth: "10px", height:"35px", borderRadius:"5px",  marginRight: "50px" }} onClick={applyFilter}>
                     <SearchIcon />
                   </Button>
+                  {user && user.userRole === "ROLE_ADMIN" && (
+                <Button style={{minWidth: "230px" }} to="/admin/attractions-management/add">
+                  New attraction
+                </Button>
+              )}
                 </div>
                 <FormControl>
                   <FormLabel id="demo-radio-buttons-group-label">
@@ -336,11 +362,7 @@ const TouristAttractionsView = () => {
                 </FormControl>
               </div>
 
-              {user && user.userRole === "ROLE_ADMIN" && (
-                <Button to="/admin/attractions-management/add">
-                  New attraction
-                </Button>
-              )}
+        
             </div>
           </div>
         </SearchContainer>
@@ -348,7 +370,7 @@ const TouristAttractionsView = () => {
           {attractions &&
             attractions.map((attraction, index) => {
               return (
-                <AttractionList key={index}>
+                <AttractionList key={index} onClick={() => handleShowDetailsModal(attraction)}>
                   <AttractionListGrid>
                     <AttractionListImageContainer>
                       <AttractionListImage

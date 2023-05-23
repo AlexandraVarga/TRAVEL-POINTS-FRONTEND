@@ -13,7 +13,7 @@ export const deleteAttraction = (attractionId) => {
 }
 
 export const updateAttraction = (attractionDto, attractionId) => {
-    return axios.put(`${process.env.REACT_APP_BASE_URL}/tourist-attractions` + attractionId, attractionDto);
+    return axios.put(`${process.env.REACT_APP_BASE_URL}/tourist-attractions/` + attractionId, attractionDto);
 }
 
 export const filterAttractions = (textSearchDto) => {
